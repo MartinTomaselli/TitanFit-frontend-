@@ -1,0 +1,34 @@
+.titan-screen-container {
+  width: 100%;
+  min-height: 100vh;
+  margin-inline: auto;
+
+  padding:
+    max(24px, env(safe-area-inset-top))
+    var(--titan-screen-padding)
+    max(24px, env(safe-area-inset-bottom));
+}
+
+.titan-screen-container--mobile {
+  max-width: var(--titan-content-width);
+}
+
+.titan-screen-container--wide {
+  max-width: 960px;
+}
+
+.titan-screen-container--full {
+  max-width: none;
+}
+
+.titan-screen-container--center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .titan-screen-container {
+    padding-inline: 28px;
+  }
+}

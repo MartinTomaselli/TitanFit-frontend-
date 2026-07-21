@@ -1,0 +1,98 @@
+.titan-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+  border-radius: var(--titan-radius-medium);
+
+  font-weight: 800;
+  letter-spacing: 0.02em;
+
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.titan-button--full {
+  width: 100%;
+}
+
+.titan-button--small {
+  min-height: 42px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.titan-button--medium {
+  min-height: 50px;
+  padding: 13px 20px;
+  font-size: 16px;
+}
+
+.titan-button--large {
+  min-height: 58px;
+  padding: 16px 24px;
+  font-size: 17px;
+}
+
+.titan-button--primary {
+  color: var(--titan-black);
+
+  border-color: var(--titan-cyan);
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--titan-cyan-soft) 0%,
+      var(--titan-cyan) 100%
+    );
+
+  box-shadow:
+    0 0 10px rgba(0, 245, 255, 0.45),
+    0 0 26px rgba(0, 245, 255, 0.2);
+}
+
+.titan-button--primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 0 14px rgba(0, 245, 255, 0.62),
+    0 0 34px rgba(0, 245, 255, 0.28);
+}
+
+.titan-button--secondary {
+  color: var(--titan-white);
+
+  border-color: var(--titan-border-soft);
+
+  background: rgba(3, 13, 18, 0.72);
+}
+
+.titan-button--secondary:hover:not(:disabled) {
+  border-color: var(--titan-border);
+  box-shadow: var(--titan-glow-small);
+}
+
+.titan-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.titan-button:focus-visible {
+  outline: 2px solid var(--titan-cyan-soft);
+  outline-offset: 3px;
+}
+
+.titan-button:disabled {
+  opacity: 0.38;
+  box-shadow: none;
+}
+
+.titan-button__label {
+  position: relative;
+  z-index: 1;
+}

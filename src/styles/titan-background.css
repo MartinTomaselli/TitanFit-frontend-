@@ -1,0 +1,79 @@
+.titan-background {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  color: var(--titan-white);
+  background-color: var(--titan-black);
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.titan-background--loading {
+  background-color: var(--titan-black);
+}
+
+.titan-background--loaded {
+  transition: opacity 240ms ease-in-out;
+}
+
+.titan-background__preloader {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.titan-background__overlay {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2, 7, 11, 0.04) 0%,
+      rgba(2, 7, 11, 0.1) 35%,
+      rgba(2, 7, 11, 0.28) 72%,
+      rgba(2, 7, 11, 0.5) 100%
+    );
+}
+
+.titan-background__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.titan-background__debug-error {
+  position: fixed;
+  z-index: 20;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--titan-danger);
+  border-radius: var(--titan-radius-small);
+
+  color: #ffd9df;
+  background: rgba(74, 8, 20, 0.92);
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  .titan-background {
+    background-position: center center;
+  }
+}

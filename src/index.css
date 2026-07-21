@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import "./styles/titan-background.css";
+@import "./styles/titan-branding.css";
+@import "./styles/screen-container.css";
+@import "./styles/ui-block.css";
+@import "./styles/titan-button.css";
 
 :root {
   /* TitanFit Brand Colors */

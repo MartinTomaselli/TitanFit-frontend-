@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 
+import TitanBackground from './components/layout/TitanBackground'
+import ScreenContainer from './components/layout/ScreenContainer'
+import UIBlock from './components/layout/UIBlock'
+
+import TitanLogo from './components/branding/TitanLogo'
+
+import TitanButton from './components/ui/TitanButton'
+
 const steps = [
   {
     key: 'name',
@@ -584,37 +592,47 @@ useEffect(() => {
 }, [])
 
   if (screen === 'welcome') {
-    return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
-        <section className="w-full max-w-md text-center">
+  return (
+    <TitanBackground>
+      <ScreenContainer
+        center
+        className="text-center"
+      >
+        <div className="w-full">
           <div className="mb-8">
-            <div className="mx-auto mb-6 h-24 w-24 rounded-3xl bg-amber-500 flex items-center justify-center text-5xl shadow-lg">
-              ⚡
-            </div>
+            <TitanLogo />
 
-            <h1 className="text-5xl font-black tracking-tight">TitanFit</h1>
-
-            <p className="mt-4 text-lg text-slate-300">
+            <p
+              className="mt-6 text-base leading-relaxed"
+              style={{ color: 'var(--titan-text-secondary)' }}
+            >
               Disciplina diaria. Resultados reales.
-            </p>
+              </p>
           </div>
 
-          <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 shadow-xl">
-            <p className="text-slate-300 leading-relaxed">
+          <UIBlock
+            padding="medium"
+            glow="medium"
+          >
+            <p
+              className="leading-relaxed"
+              style={{ color: 'var(--titan-text-secondary)' }}
+            >
               Tu coach personal de calistenia, progreso físico y recomendaciones alimenticias.
             </p>
 
-            <button
+            <TitanButton
+              className="mt-7"
               onClick={startOnboarding}
-              className="mt-8 w-full rounded-2xl bg-amber-500 px-6 py-4 text-lg font-bold text-slate-950"
             >
               Empezar
-            </button>
-          </div>
-        </section>
-      </main>
-    )
-  }
+            </TitanButton>
+          </UIBlock>
+        </div>
+      </ScreenContainer>
+    </TitanBackground>
+  )
+}
 
 if (screen === 'emailLogin') {
   return (

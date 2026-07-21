@@ -1,1 +1,103 @@
 @import "tailwindcss";
+
+:root {
+  /* TitanFit Brand Colors */
+  --titan-black: #04090d;
+  --titan-black-soft: #081117;
+  --titan-panel: rgba(5, 18, 24, 0.78);
+  --titan-panel-strong: rgba(4, 13, 18, 0.92);
+
+  --titan-cyan: #00f5ff;
+  --titan-cyan-soft: #66faff;
+  --titan-cyan-muted: rgba(0, 245, 255, 0.45);
+  --titan-cyan-faint: rgba(0, 245, 255, 0.12);
+
+  --titan-white: #f4fbff;
+  --titan-text-secondary: #a6bac3;
+  --titan-text-muted: #6f8792;
+
+  --titan-success: #3ce7a5;
+  --titan-warning: #f5c451;
+  --titan-danger: #ff667a;
+
+  /* Borders and effects */
+  --titan-border: rgba(0, 245, 255, 0.72);
+  --titan-border-soft: rgba(0, 245, 255, 0.25);
+
+  --titan-glow-small:
+    0 0 8px rgba(0, 245, 255, 0.35);
+
+  --titan-glow-medium:
+    0 0 10px rgba(0, 245, 255, 0.35),
+    0 0 24px rgba(0, 245, 255, 0.18);
+
+  --titan-glow-strong:
+    0 0 12px rgba(0, 245, 255, 0.5),
+    0 0 32px rgba(0, 245, 255, 0.28);
+
+  /* Layout */
+  --titan-content-width: 440px;
+  --titan-screen-padding: 20px;
+
+  /* Radius */
+  --titan-radius-small: 12px;
+  --titan-radius-medium: 18px;
+  --titan-radius-large: 28px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--titan-black);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--titan-black);
+  color: var(--titan-white);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  color: var(--titan-black);
+  background: var(--titan-cyan);
+}

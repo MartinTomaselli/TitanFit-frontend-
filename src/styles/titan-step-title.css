@@ -1,0 +1,42 @@
+.titan-step-title {
+  width: 100%;
+}
+
+.titan-step-title--left {
+  text-align: left;
+}
+
+.titan-step-title--center {
+  text-align: center;
+}
+
+.titan-step-title__eyebrow {
+  margin: 0;
+
+  color: var(--titan-cyan);
+
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.titan-step-title__heading {
+  margin: 10px 0 0;
+
+  color: var(--titan-white);
+
+  font-size: clamp(30px, 8vw, 40px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.titan-step-title__subtitle {
+  margin: 16px 0 0;
+
+  color: var(--titan-text-secondary);
+
+  font-size: 16px;
+  line-height: 1.65;
+}

@@ -1,0 +1,83 @@
+.titan-option-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 58px;
+  gap: 14px;
+  padding: 14px 16px;
+
+  border: 1px solid var(--titan-border-soft);
+  border-radius: var(--titan-radius-medium);
+
+  color: var(--titan-white);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 17, 23, 0.78) 0%,
+      rgba(3, 12, 17, 0.9) 100%
+    );
+
+  text-align: left;
+
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.titan-option-card:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--titan-cyan-muted);
+  box-shadow: var(--titan-glow-small);
+}
+
+.titan-option-card--selected {
+  color: var(--titan-black);
+  border-color: var(--titan-cyan);
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--titan-cyan-soft) 0%,
+      var(--titan-cyan) 100%
+    );
+
+  box-shadow: var(--titan-glow-medium);
+}
+
+.titan-option-card__indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+
+  border: 1px solid var(--titan-border-soft);
+  border-radius: 50%;
+
+  color: var(--titan-black);
+  background: rgba(0, 245, 255, 0.08);
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.titan-option-card--selected .titan-option-card__indicator {
+  border-color: rgba(4, 9, 13, 0.32);
+  background: rgba(4, 9, 13, 0.16);
+}
+
+.titan-option-card__label {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.titan-option-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}

@@ -1,0 +1,43 @@
+.titan-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 16px;
+
+  border: 1px solid var(--titan-border-soft);
+  border-radius: var(--titan-radius-medium);
+
+  color: var(--titan-white);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2, 10, 15, 0.9) 0%,
+      rgba(3, 15, 21, 0.82) 100%
+    );
+
+  outline: none;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.titan-input::placeholder {
+  color: var(--titan-text-muted);
+}
+
+.titan-input:hover {
+  border-color: var(--titan-cyan-muted);
+}
+
+.titan-input:focus {
+  border-color: var(--titan-cyan);
+  box-shadow:
+    0 0 0 3px rgba(0, 245, 255, 0.1),
+    0 0 16px rgba(0, 245, 255, 0.16);
+}
+
+.titan-input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

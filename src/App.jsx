@@ -9,6 +9,10 @@ import TitanLogo from './components/branding/TitanLogo'
 
 import TitanButton from './components/ui/TitanButton'
 
+import OnboardingScreen from './screens/OnboardingScreen'
+import DashboardScreen from './screens/DashboardScreen'
+import WorkoutScreen from './screens/WorkoutScreen'
+
 const steps = [
   {
     key: 'name',
@@ -356,7 +360,9 @@ async function loadTitanFitData(userId) {
             display_name,
             type,
             category,
-            movement_type
+            movement_type,
+            thumbnail_url,
+            video_url
           )
         `)
         .in('workout_day_id', dayIds)
@@ -636,248 +642,136 @@ useEffect(() => {
 
 if (screen === 'emailLogin') {
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
-      <section className="w-full max-w-md">
-        <button
-          onClick={() => setScreen('welcome')}
-          className="mb-6 text-sm font-bold text-slate-400"
-        >
-          ← Volver
-        </button>
-
-        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-          <p className="text-sm font-bold text-amber-400">
-            Acceso TitanFit
-          </p>
-
-          <h1 className="mt-3 text-4xl font-black leading-tight">
-            Ingresa tu email
-          </h1>
-
-          <p className="mt-4 text-slate-300">
-            Te enviaremos un enlace seguro para confirmar tu cuenta y guardar tu progreso.
-          </p>
-
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="tu@email.com"
-            className="mt-6 w-full rounded-2xl border border-slate-700 bg-slate-950 px-5 py-4 text-lg text-white"
-          />
-
-          {dataError && (
-            <div className="mt-4 rounded-2xl border border-red-500 bg-red-950/50 p-4 text-sm text-red-200">
-              {dataError}
-            </div>
-          )}
-
-          {emailSent && (
-            <div className="mt-4 rounded-2xl border border-emerald-500 bg-emerald-950/40 p-4 text-sm text-emerald-200">
-              Revisa tu correo y abre el enlace de acceso. Después volverás a TitanFit para completar tu perfil.
-            </div>
-          )}
+    <TitanBackground>
+      <ScreenContainer
+        center
+        className="text-center"
+      >
+        <div className="w-full">
+          <TitanLogo />
 
           <button
-            onClick={sendMagicLink}
-            disabled={!email || loadingData}
-            className="mt-6 w-full rounded-2xl bg-amber-500 px-6 py-4 text-lg font-black text-slate-950 disabled:opacity-40"
+            type="button"
+            onClick={() => setScreen('welcome')}
+            className="mt-8 inline-flex items-center gap-2 text-sm font-bold transition-opacity hover:opacity-80"
+            style={{ color: 'var(--titan-text-secondary)' }}
           >
-            {loadingData ? 'Enviando enlace...' : 'Enviar enlace de acceso'}
+            <span aria-hidden="true">←</span>
+            Volver
           </button>
+
+          <UIBlock
+            padding="medium"
+            glow="medium"
+            className="mt-6 text-left"
+          >
+            <p
+              className="text-sm font-black uppercase tracking-[0.18em]"
+              style={{ color: 'var(--titan-cyan)' }}
+            >
+              Acceso TitanFit
+            </p>
+
+            <h1 className="mt-3 text-3xl font-black leading-tight">
+              Ingresa tu email
+            </h1>
+
+            <p
+              className="mt-4 leading-relaxed"
+              style={{ color: 'var(--titan-text-secondary)' }}
+            >
+              Te enviaremos un enlace seguro para confirmar tu cuenta y guardar tu progreso.
+            </p>
+
+            <label
+              htmlFor="titanfit-email"
+              className="mt-6 block text-sm font-bold"
+              style={{ color: 'var(--titan-text-secondary)' }}
+            >
+              Correo electrónico
+            </label>
+
+            <input
+              id="titanfit-email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="tu@email.com"
+              autoComplete="email"
+              className="titan-input mt-2"
+            />
+
+            {dataError && (
+              <div
+                className="mt-4 rounded-2xl border p-4 text-sm leading-relaxed"
+                style={{
+                  color: '#ffd9df',
+                  borderColor: 'var(--titan-danger)',
+                  background: 'rgba(74, 8, 20, 0.72)',
+                }}
+              >
+                {dataError}
+              </div>
+            )}
+
+            {emailSent && (
+              <div
+                className="mt-4 rounded-2xl border p-4 text-sm leading-relaxed"
+                style={{
+                  color: '#c9ffe9',
+                  borderColor: 'var(--titan-success)',
+                  background: 'rgba(7, 62, 44, 0.58)',
+                }}
+              >
+                Revisa tu correo y abre el enlace de acceso. Después volverás a TitanFit para completar tu perfil.
+              </div>
+            )}
+
+            <TitanButton
+              className="mt-6"
+              onClick={sendMagicLink}
+              disabled={!email || loadingData}
+            >
+              {loadingData
+                ? 'Enviando enlace...'
+                : 'Enviar enlace de acceso'}
+            </TitanButton>
+          </UIBlock>
         </div>
-      </section>
-    </main>
+      </ScreenContainer>
+    </TitanBackground>
   )
 }  
 
   if (screen === 'dashboard') {
-    return (
-      <main className="min-h-screen bg-slate-950 text-white px-5 py-6">
-        <section className="mx-auto w-full max-w-md">
-          <header className="mb-6">
-           <p className="text-sm font-bold text-amber-400">
-            Semana {activePlan?.week_number || 1} de 12
-           </p>
-
-            <h1 className="mt-2 text-4xl font-black leading-tight">
-              Hola, {dbUser?.name || dbUser?.nombre || answers.name || 'Titán'} 👋
-            </h1>
-
-            <p className="mt-2 break-all text-xs text-slate-500">
-              ID de soporte: {dbUser?.id || sessionUser?.id || 'Sin ID'}
-            </p>
-
-            <p className="mt-3 text-slate-300">
-               Disciplina diaria. Resultados reales.
-            </p>
-          </header>
-
-          <section className="mb-5 rounded-3xl border border-amber-500/30 bg-amber-500 p-5 text-slate-950 shadow-xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-black uppercase tracking-wide">
-                  Entrenamiento de hoy
-                </p>
-
-                <h2 className="mt-2 text-3xl font-black">
-                  {getGoalLabel(dbUser?.goal)}
-                </h2>
-
-                <p className="mt-2 font-semibold">
-                  Duración estimada: {dbUser?.session_time || 20} min
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-slate-950 px-4 py-3 text-center text-white">
-                <p className="text-xs text-slate-400">Día</p>
-                <p className="text-2xl font-black">
-                  {selectedDayNumber}
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setScreen('workout')}
-              className="mt-6 w-full rounded-2xl bg-slate-950 px-6 py-4 text-lg font-black text-white"
-            >
-              Comenzar entrenamiento
-            </button>
-          </section>
-
-         <section className="mb-5 rounded-3xl border border-slate-800 bg-slate-900 p-5 shadow-xl">
-          <p className="text-sm font-bold text-emerald-400">
-            Recomendación alimenticia
-          </p>
-
-          <h2 className="mt-1 text-2xl font-black">
-            {nutritionProfile?.diet_type || 'Perfil nutricional'}
-          </h2>
-
-          <FoodPieChart nutritionProfile={nutritionProfile} />
-
-          {nutritionProfile?.meals_per_day && (
-            <p className="mt-4 text-sm text-slate-300">
-              Comidas recomendadas por día:{' '}
-              <span className="font-bold text-white">
-                {nutritionProfile.meals_per_day}
-              </span>
-             </p>
-           )}
-
-          {nutritionProfile?.fasting !== undefined &&
-            nutritionProfile?.fasting !== null && (
-              <p className="mt-2 text-sm text-slate-300">
-                Ayuno recomendado:{' '}
-                <span className="font-bold text-white">
-                  {nutritionProfile.fasting === true ||
-                  nutritionProfile.fasting === 'true'
-                    ? 'Sí'
-                    : 'No'}
-                </span>
-              </p>
-            )}
-        </section>
-
-          <section className="mb-5 rounded-3xl border border-slate-800 bg-slate-900 p-5 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-bold text-sky-400">
-                  Progreso semanal
-                </p>
-
-                <h2 className="mt-1 text-2xl font-black">
-                  Semana {activePlan?.week_number || 1}
-                </h2>
-              </div>
-
-              <p className="text-2xl font-black text-amber-400">
-                {Math.round(((activePlan?.week_number || 1) / 12) * 100)}%
-              </p>
-            </div>
-
-            <div className="mt-5 h-3 rounded-full bg-slate-950">
-              <div
-                className="h-3 rounded-full bg-amber-500"
-                style={{
-                  width: `${Math.round(((activePlan?.week_number || 1) / 12) * 100)}%`,
-                }}
-              />
-            </div>
-          </section>
-
-          <section>
-            <button
-              onClick={startCheckpoint}
-              className="w-full rounded-2xl bg-slate-800 px-4 py-4 font-bold text-white"
-            >
-              Checkpoint semanal
-            </button>
-          </section>
-        </section>
-      </main>
-    )
-  }
-  
+  return (
+    <DashboardScreen
+      activePlan={activePlan}
+      dbUser={dbUser}
+      sessionUser={sessionUser}
+      fallbackName={answers.name}
+      nutritionProfile={nutritionProfile}
+      selectedDayNumber={selectedDayNumber}
+      goalLabel={getGoalLabel(dbUser?.goal)}
+      onStartWorkout={() => setScreen('workout')}
+      onStartCheckpoint={startCheckpoint}
+    />
+  )
+}  
   if (screen === 'workout') {
   const workoutDay =
-    weeklyDays.find((day) => day.day_number === selectedDayNumber) ||
-    weeklyDays[0]
-
-  const warmupExercises =
-    workoutDay?.exercises?.filter((item) => item.block === 'warmup') || []
-
-  const mainExercises =
-    workoutDay?.exercises?.filter((item) => item.block === 'main') || []
-
-  const cooldownExercises =
-    workoutDay?.exercises?.filter((item) => item.block === 'cooldown') || []
+    weeklyDays.find(
+      (day) => day.day_number === selectedDayNumber
+    ) || weeklyDays[0]
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white px-5 py-6">
-      <section className="mx-auto w-full max-w-md">
-        <button
-          onClick={() => setScreen('dashboard')}
-          className="mb-6 text-sm font-bold text-slate-400"
-        >
-          ← Volver al dashboard
-        </button>
-
-        <p className="text-sm font-bold text-amber-400">
-          Día {workoutDay?.day_number || selectedDayNumber} · {getGoalLabel(dbUser?.goal)}
-        </p>
-
-        <h1 className="mt-2 text-4xl font-black">
-          Entrenamiento de hoy
-        </h1>
-
-        <p className="mt-3 text-slate-300">
-          Completa las 3 fases: warmup, main y cooldown.
-        </p>
-
-        <WorkoutBlock
-          title="Warmup"
-          exercises={warmupExercises}
-        />
-
-        <WorkoutBlock
-          title="Main"
-          exercises={mainExercises}
-        />
-
-        <WorkoutBlock
-          title="Cooldown"
-          exercises={cooldownExercises}
-        />
-
-        <button
-          onClick={completeCurrentWorkout}
-          className="mt-6 w-full rounded-2xl bg-amber-500 px-6 py-4 text-lg font-black text-slate-950"
-        >
-          Marcar entrenamiento completado
-        </button>
-      </section>
-    </main>
+    <WorkoutScreen
+      workoutDay={workoutDay}
+      selectedDayNumber={selectedDayNumber}
+      goalLabel={getGoalLabel(dbUser?.goal)}
+      onBack={() => setScreen('dashboard')}
+      onComplete={completeCurrentWorkout}
+/>
   )
 }
   if (screen === 'checkpoint') {
@@ -1057,81 +951,17 @@ if (screen === 'emailLogin') {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white px-6 py-8">
-      <section className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md flex-col">
-        <div>
-          <div className="flex items-center justify-between text-sm text-slate-400">
-            <span>
-              Paso {currentStep + 1} de {steps.length}
-            </span>
-            <span>{Math.round(progress)}%</span>
-          </div>
-
-          <div className="mt-3 h-2 rounded-full bg-slate-800">
-            <div
-              className="h-2 rounded-full bg-amber-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-1 flex-col justify-center py-10">
-          <h1 className="text-4xl font-black leading-tight">
-            {step.title}
-          </h1>
-
-          <p className="mt-4 text-slate-300">
-            {step.subtitle}
-          </p>
-
-          <div className="mt-8 space-y-3">
-            {step.type === 'input' ? (
-              <input
-                value={answers[step.key] || ''}
-                onChange={(event) => selectAnswer(event.target.value)}
-                placeholder={step.placeholder}
-                className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-5 py-4 text-lg text-white"
-              />
-            ) : (
-              step.options.map((option) => {
-                const selected = answers[step.key] === option
-
-                return (
-                  <button
-                    key={option}
-                    onClick={() => selectAnswer(option)}
-                    className={`w-full rounded-2xl border px-5 py-4 text-left text-lg font-bold ${
-                      selected
-                        ? 'border-amber-500 bg-amber-500 text-slate-950'
-                        : 'border-slate-800 bg-slate-900 text-white'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                )
-              })
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={previousStep}
-            className="rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white"
-          >
-            Atrás
-          </button>
-
-          <button
-            onClick={nextStep}
-            disabled={!answers[step.key]}
-            className="rounded-2xl bg-amber-500 px-6 py-4 font-bold text-slate-950 disabled:opacity-40"
-          >
-            Continuar
-          </button>
-        </div>
-      </section>
-    </main>
+   <OnboardingScreen
+      step={step}
+      currentStep={currentStep}
+      stepsLength={steps.length}
+      progress={progress}
+      answers={answers}
+      loadingData={loadingData}
+      onSelectAnswer={selectAnswer}
+      onPrevious={previousStep}
+      onNext={nextStep}
+    />
   )
 }
 
@@ -1191,85 +1021,4 @@ function LegendItem({ color, label, value }) {
     </div>
   )
 }
-
-function WorkoutBlock({ title, exercises }) {
-  return (
-    <section className="mt-6 rounded-3xl border border-slate-800 bg-slate-900 p-5">
-      <h2 className="text-2xl font-black">{title}</h2>
-
-      <div className="mt-4 space-y-3">
-        {exercises.length === 0 ? (
-          <p className="text-sm text-slate-400">
-            No hay ejercicios cargados para este bloque.
-          </p>
-        ) : (
-          exercises.map((item, index) => {
-            const exerciseName =
-              item.exercises?.display_name || item.exercise_name || 'Ejercicio'
-
-            const hasReps = item.reps !== null && item.reps !== undefined
-            const hasDuration =
-              item.duration_sec !== null && item.duration_sec !== undefined
-
-            return (
-              <div
-                key={item.id || `${title}-${index}`}
-                className="rounded-2xl bg-slate-950 p-4"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-sm font-black text-amber-400">
-                    {index + 1}
-                  </div>
-
-                  <div className="flex-1">
-                    <p className="font-bold">{exerciseName}</p>
-
-                    <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-300">
-                      <div className="rounded-xl bg-slate-900 p-2">
-                        <span className="block text-slate-500">Sets</span>
-                        <span className="font-bold text-white">
-                          {item.sets || '-'}
-                        </span>
-                      </div>
-
-                      <div className="rounded-xl bg-slate-900 p-2">
-                        <span className="block text-slate-500">
-                          {hasReps ? 'Reps' : 'Duración'}
-                        </span>
-                        <span className="font-bold text-white">
-                          {hasReps
-                            ? item.reps
-                            : hasDuration
-                              ? `${item.duration_sec}s`
-                              : '-'}
-                        </span>
-                      </div>
-
-                      <div className="rounded-xl bg-slate-900 p-2">
-                        <span className="block text-slate-500">Descanso</span>
-                        <span className="font-bold text-white">
-                          {item.rest_sec !== null && item.rest_sec !== undefined
-                            ? `${item.rest_sec}s`
-                            : '-'}
-                        </span>
-                      </div>
-
-                      <div className="rounded-xl bg-slate-900 p-2">
-                        <span className="block text-slate-500">Superset</span>
-                        <span className="font-bold text-white">
-                          {item.superset_group || '-'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )
-          })
-        )}
-      </div>
-    </section>
-  )
-}
-
 export default App

@@ -4,6 +4,12 @@
 @import "./styles/screen-container.css";
 @import "./styles/ui-block.css";
 @import "./styles/titan-button.css";
+@import "./styles/titan-input.css";
+@import "./styles/titan-progress.css";
+@import "./styles/titan-option-card.css";
+@import "./styles/titan-step-title.css";
+@import "./styles/titan-bottom-nav.css";
+@import "./styles/exercise-media.css";
 
 :root {
   /* TitanFit Brand Colors */

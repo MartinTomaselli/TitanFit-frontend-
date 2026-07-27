@@ -1,0 +1,21 @@
+.titan-bottom-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.titan-bottom-nav .titan-button {
+  min-width: 0;
+}
+
+@media (max-width: 360px) {
+  .titan-bottom-nav {
+    gap: 8px;
+  }
+
+  .titan-bottom-nav .titan-button--large {
+    padding-inline: 12px;
+    font-size: 15px;
+  }
+}

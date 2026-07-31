@@ -4,6 +4,7 @@ import { getExerciseMediaUrls } from '../../services/exerciseMedia'
 function ExerciseMedia({
   exercise,
   className = '',
+  compact = false,
 }) {
   const [media, setMedia] = useState({
     thumbnailUrl: null,
@@ -91,7 +92,11 @@ function ExerciseMedia({
           .join(' ')}
       >
         <video
-          className="exercise-media__video"
+         className={
+          compact
+          ? 'exercise-media__video exercise-media__video--compact'
+          : 'exercise-media__video'
+         }
           src={media.videoUrl}
           poster={media.thumbnailUrl || undefined}
           autoPlay
@@ -115,7 +120,11 @@ function ExerciseMedia({
           .join(' ')}
       >
         <img
-          className="exercise-media__image"
+         className={
+          compact
+          ? 'exercise-media__image exercise-media__image--compact'
+          : 'exercise-media__image'
+        }
           src={media.thumbnailUrl}
           alt={exercise?.display_name || 'Ejercicio TitanFit'}
         />

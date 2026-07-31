@@ -65,3 +65,11 @@
     background-position: -200% 0;
   }
 }
+
+.exercise-media__image--compact,
+.exercise-media__video--compact {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+}

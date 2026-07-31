@@ -12,6 +12,8 @@ import TitanButton from './components/ui/TitanButton'
 import OnboardingScreen from './screens/OnboardingScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import WorkoutScreen from './screens/WorkoutScreen'
+import CheckpointScreen from './screens/CheckpointScreen'
+import CheckpointSummaryScreen from './screens/CheckpointSummaryScreen'
 
 const steps = [
   {
@@ -281,23 +283,58 @@ function normalizeAgeRange(value) {
   return map[value] || value
 }
 
-function completeCurrentWorkout() {
-  setSelectedDayNumber((currentDay) => {
-    const nextDay = currentDay + 1
+async function completeCurrentWorkout() {
+  try {
+    const sortedDays = [...weeklyDays].sort(
+      (a, b) => a.day_number - b.day_number
+    )
 
-    if (nextDay <= weeklyDays.length) {
-      return nextDay
+    const currentDayIndex = sortedDays.findIndex(
+      (day) => day.day_number === selectedDayNumber
+    )
+
+    const nextWorkoutDay =
+      currentDayIndex >= 0
+        ? sortedDays[currentDayIndex + 1]
+        : null
+
+    // Si no existe otro día, terminó la semana
+    if (!nextWorkoutDay) {
+      startCheckpoint()
+      return
     }
 
-    return currentDay
-  })
+    const { error } = await supabase
+      .from('plans')
+      .update({
+        current_day_number: nextWorkoutDay.day_number,
+      })
+      .eq('id', activePlan.id)
 
-  if (selectedDayNumber >= weeklyDays.length) {
-    startCheckpoint()
-  } else {
+    if (error) {
+      throw error
+    }
+
+    setSelectedDayNumber(nextWorkoutDay.day_number)
+
+    setActivePlan((currentPlan) => ({
+      ...currentPlan,
+      current_day_number: nextWorkoutDay.day_number,
+    }))
+
     setScreen('dashboard')
+  } catch (error) {
+    console.error(
+      'Error al guardar el avance del entrenamiento:',
+      error
+    )
+
+    setDataError(
+      `No se pudo guardar el avance del entrenamiento: ${error.message}`
+    )
   }
 }
+
 async function loadTitanFitData(userId) {
   setLoadingData(true)
   setDataError(null)
@@ -378,11 +415,28 @@ async function loadTitanFitData(userId) {
       }))
     }
 
-    setDbUser(userData)
-    setActivePlan(planData)
-    setWeeklyDays(daysWithExercises)
-    setNutritionProfile(nutritionData)
-    setScreen('dashboard')
+const sortedDays = [...daysWithExercises].sort(
+  (a, b) => a.day_number - b.day_number
+)
+
+const savedDayNumber = Number(
+  planData?.current_day_number || 1
+)
+
+const savedDayExists = sortedDays.some(
+  (day) => day.day_number === savedDayNumber
+)
+
+const restoredDayNumber = savedDayExists
+  ? savedDayNumber
+  : sortedDays[0]?.day_number || 1
+
+setDbUser(userData)
+setActivePlan(planData)
+setWeeklyDays(sortedDays)
+setSelectedDayNumber(restoredDayNumber)
+setNutritionProfile(nutritionData)
+setScreen('dashboard')
   } catch (error) {
     console.error(error)
     setDataError(error.message)
@@ -537,22 +591,49 @@ async function generateNextWeek() {
     const userId = sessionUser?.id || dbUser?.id
 
     if (!userId) {
-      throw new Error('No se encontró usuario activo para generar la siguiente semana.')
+      throw new Error(
+        'No se encontró usuario activo para generar la siguiente semana.'
+      )
     }
 
-    const { error } = await supabase.rpc('complete_week_and_generate_next', {
-      p_user_id: userId,
-      p_energy: mapCheckpointEnergy(checkpointAnswers.energy),
-      p_intention: mapCheckpointIntention(checkpointAnswers.intention),
-      p_pain: mapCheckpointPain(checkpointAnswers.pain),
-      p_pain_areas:
-        mapCheckpointPain(checkpointAnswers.pain) === 'none'
-          ? []
-          : checkpointAnswers.painAreas || [],
-      p_next_goal: mapCheckpointGoal(checkpointAnswers.goalUpdate),
-    })
+    const { error: generationError } = await supabase.rpc(
+      'complete_week_and_generate_next',
+      {
+        p_user_id: userId,
+        p_energy: mapCheckpointEnergy(
+          checkpointAnswers.energy
+        ),
+        p_intention: mapCheckpointIntention(
+          checkpointAnswers.intention
+        ),
+        p_pain: mapCheckpointPain(
+          checkpointAnswers.pain
+        ),
+        p_pain_areas:
+          mapCheckpointPain(checkpointAnswers.pain) === 'none'
+            ? []
+            : checkpointAnswers.painAreas || [],
+        p_next_goal: mapCheckpointGoal(
+          checkpointAnswers.goalUpdate
+        ),
+      }
+    )
 
-    if (error) throw error
+    if (generationError) {
+      throw generationError
+    }
+
+    const { error: resetDayError } = await supabase
+      .from('plans')
+      .update({
+        current_day_number: 1,
+      })
+      .eq('user_id', userId)
+      .eq('status', 'active')
+
+    if (resetDayError) {
+      throw resetDayError
+    }
 
     setSelectedDayNumber(1)
     setCheckpointStep(0)
@@ -560,7 +641,11 @@ async function generateNextWeek() {
 
     await loadTitanFitData(userId)
   } catch (error) {
-    console.error(error)
+    console.error(
+      'Error al generar la siguiente semana:',
+      error
+    )
+
     setDataError(error.message)
   } finally {
     setLoadingData(false)
@@ -775,180 +860,34 @@ if (screen === 'emailLogin') {
   )
 }
   if (screen === 'checkpoint') {
-  const showPainAreas =
-    checkpointQuestion.key === 'pain' &&
-    checkpointAnswers.pain &&
-    checkpointAnswers.pain !== 'Ninguna molestia'
-
   return (
-    <main className="min-h-screen bg-slate-950 text-white px-6 py-8">
-      <section className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md flex-col">
-        <div>
-          <button
-            onClick={() => setScreen('dashboard')}
-            className="mb-6 text-sm font-bold text-slate-400"
-          >
-            ← Volver al dashboard
-          </button>
-
-          <div className="flex items-center justify-between text-sm text-slate-400">
-            <span>
-              Pregunta {checkpointStep + 1} de {checkpointQuestions.length}
-            </span>
-            <span>{Math.round(checkpointProgress)}%</span>
-          </div>
-
-          <div className="mt-3 h-2 rounded-full bg-slate-800">
-            <div
-              className="h-2 rounded-full bg-amber-500"
-              style={{ width: `${checkpointProgress}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-1 flex-col justify-center py-10">
-          <p className="text-sm font-bold text-amber-400">
-            Checkpoint semanal
-          </p>
-
-          <h1 className="mt-3 text-4xl font-black leading-tight">
-            {checkpointQuestion.title}
-          </h1>
-
-          <p className="mt-4 text-slate-300">
-            {checkpointQuestion.subtitle}
-          </p>
-
-          <div className="mt-8 space-y-3">
-            {checkpointQuestion.options.map((option) => {
-              const selected =
-                checkpointAnswers[checkpointQuestion.key] === option
-
-              return (
-                <button
-                  key={option}
-                  onClick={() => selectCheckpointAnswer(option)}
-                  className={`w-full rounded-2xl border px-5 py-4 text-left text-lg font-bold ${
-                    selected
-                      ? 'border-amber-500 bg-amber-500 text-slate-950'
-                      : 'border-slate-800 bg-slate-900 text-white'
-                  }`}
-                >
-                  {option}
-                </button>
-              )
-            })}
-          </div>
-
-          {showPainAreas && (
-            <div className="mt-8">
-              <p className="text-sm font-bold text-red-300">
-                ¿Dónde sentiste la molestia o dolor?
-              </p>
-
-              <p className="mt-2 text-sm text-slate-400">
-                Puedes seleccionar una o varias zonas.
-              </p>
-
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                {painAreas.map((area) => {
-                  const selected =
-                    checkpointAnswers.painAreas?.includes(area.key)
-
-                  return (
-                    <button
-                      key={area.key}
-                      onClick={() => togglePainArea(area.key)}
-                      className={`rounded-2xl border px-4 py-3 text-left text-sm font-bold ${
-                        selected
-                          ? 'border-red-400 bg-red-500 text-white'
-                          : 'border-slate-800 bg-slate-900 text-white'
-                      }`}
-                    >
-                      {area.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={previousCheckpointStep}
-            className="rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white"
-          >
-            Atrás
-          </button>
-
-          <button
-            onClick={nextCheckpointStep}
-            disabled={
-              !checkpointAnswers[checkpointQuestion.key] ||
-              (showPainAreas &&
-                (!checkpointAnswers.painAreas ||
-                  checkpointAnswers.painAreas.length === 0))
-            }
-            className="rounded-2xl bg-amber-500 px-6 py-4 font-bold text-slate-950 disabled:opacity-40"
-          >
-            Continuar
-          </button>
-        </div>
-      </section>
-    </main>
+    <CheckpointScreen
+      checkpointQuestion={checkpointQuestion}
+      checkpointStep={checkpointStep}
+      questionsLength={checkpointQuestions.length}
+      checkpointProgress={checkpointProgress}
+      checkpointAnswers={checkpointAnswers}
+      painAreas={painAreas}
+      onSelectAnswer={selectCheckpointAnswer}
+      onTogglePainArea={togglePainArea}
+      onPrevious={previousCheckpointStep}
+      onNext={nextCheckpointStep}
+      onBackToDashboard={() => setScreen('dashboard')}
+    />
   )
 }
 
   if (screen === 'checkpointSummary') {
-    return (
-      <main className="min-h-screen bg-slate-950 text-white px-6 py-8">
-        <section className="mx-auto w-full max-w-md">
-          <p className="text-sm font-bold text-amber-400">
-            Checkpoint completado
-          </p>
-
-          <h1 className="mt-3 text-4xl font-black leading-tight">
-            Datos listos para generar la siguiente semana.
-          </h1>
-
-          <p className="mt-4 text-slate-300">
-            Más adelante esta pantalla enviará la información a Supabase para ejecutar el motor semanal.
-          </p>
-
-          <div className="mt-8 space-y-3">
-            {checkpointQuestions.map((item) => (
-              <div
-                key={item.key}
-                className="rounded-2xl border border-slate-800 bg-slate-900 p-4"
-              >
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  {item.title}
-                </p>
-                <p className="mt-1 font-bold text-white">
-                  {checkpointAnswers[item.key] || 'Sin respuesta'}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {dataError && (
-            <div className="mt-6 rounded-2xl border border-red-500 bg-red-950/50 p-4 text-sm text-red-200">
-            {dataError}
-          </div>
-        )}
-
-          <button
-            onClick={generateNextWeek}
-            disabled={loadingData}
-            className="mt-8 w-full rounded-2xl bg-amber-500 px-6 py-4 text-lg font-black text-slate-950 disabled:opacity-50"
-          >
-            {loadingData ? 'Generando nueva semana...' : 'Generar siguiente semana'}
-          </button>
-        </section>
-      </main>
-    )
-  }
+  return (
+    <CheckpointSummaryScreen
+      checkpointQuestions={checkpointQuestions}
+      checkpointAnswers={checkpointAnswers}
+      dataError={dataError}
+      loadingData={loadingData}
+      onGenerateNextWeek={generateNextWeek}
+    />
+  )
+}
 
   return (
    <OnboardingScreen

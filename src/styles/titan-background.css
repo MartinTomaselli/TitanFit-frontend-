@@ -8,9 +8,19 @@
 
   color: var(--titan-white);
   background-color: var(--titan-black);
-  background-position: center top;
+}
+
+.titan-background__image {
+  position: fixed;
+  z-index: -2;
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+  background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
+  pointer-events: none;
 }
 
 .titan-background--loading {
@@ -73,7 +83,7 @@
 }
 
 @media (min-width: 768px) {
-  .titan-background {
+  .titan-background__image {
     background-position: center center;
   }
 }

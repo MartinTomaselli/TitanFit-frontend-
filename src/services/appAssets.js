@@ -2,12 +2,20 @@ import { supabase } from '../lib/supabaseClient'
 
 const DEFAULT_SIGNED_URL_DURATION = 60 * 60
 
+const assetUrlCache = new Map()
+
 export async function getAppAssetSignedUrl(
   assetKey,
   expiresIn = DEFAULT_SIGNED_URL_DURATION
 ) {
   if (!assetKey) {
     throw new Error('Se requiere un assetKey para cargar el recurso.')
+  }
+
+  const cachedAsset = assetUrlCache.get(assetKey)
+
+  if (cachedAsset) {
+    return cachedAsset
   }
 
   const { data: asset, error: assetError } = await supabase
@@ -43,9 +51,10 @@ export async function getAppAssetSignedUrl(
     )
   }
 
-  const { data: signedData, error: signedError } = await supabase.storage
-    .from(asset.bucket_name)
-    .createSignedUrl(asset.storage_path, expiresIn)
+  const { data: signedData, error: signedError } =
+    await supabase.storage
+      .from(asset.bucket_name)
+      .createSignedUrl(asset.storage_path, expiresIn)
 
   if (signedError) {
     throw new Error(
@@ -59,10 +68,14 @@ export async function getAppAssetSignedUrl(
     )
   }
 
-  return {
+  const result = {
     signedUrl: signedData.signedUrl,
     altText: asset.alt_text || '',
     version: asset.version || null,
     assetType: asset.asset_type || null,
   }
+
+  assetUrlCache.set(assetKey, result)
+
+  return result
 }

@@ -61,8 +61,12 @@ function TitanBackground({
       ]
         .filter(Boolean)
         .join(' ')}
-      style={backgroundStyle}
     >
+      <div
+        className="titan-background__image"
+        style={backgroundStyle}
+        aria-hidden="true"
+      />
       {backgroundUrl && (
         <img
           src={backgroundUrl}

@@ -133,6 +133,7 @@ const painAreas = [
 
 function App() {
   const [screen, setScreen] = useState('welcome')
+  const [initializingApp, setInitializingApp] = useState(true)
   const [email, setEmail] = useState('')
   const [emailSent, setEmailSent] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
@@ -654,33 +655,82 @@ async function generateNextWeek() {
 
 useEffect(() => {
   async function initTitanFit() {
-    const { data } = await supabase.auth.getSession()
-    const user = data.session?.user
+    try {
+      setInitializingApp(true)
 
-    const params = new URLSearchParams(window.location.search)
-    const devUserId = params.get('dev_user_id')
+      const { data, error } = await supabase.auth.getSession()
 
-    if (user) {
-      setSessionUser(user)
-
-      const isDev = user.email === DEV_EMAIL && devUserId
-
-      if (isDev) {
-        setIsDeveloperMode(true)
-        setDeveloperUserId(devUserId)
-        await loadTitanFitData(devUserId)
-        return
+      if (error) {
+        throw error
       }
 
-      await loadTitanFitData(user.id)
-    } else {
-      setLoadingData(false)
+      const user = data.session?.user
+
+      const params = new URLSearchParams(window.location.search)
+      const devUserId = params.get('dev_user_id')
+
+      if (user) {
+        setSessionUser(user)
+
+        const isDev =
+          user.email === DEV_EMAIL && devUserId
+
+        if (isDev) {
+          setIsDeveloperMode(true)
+          setDeveloperUserId(devUserId)
+
+          await loadTitanFitData(devUserId)
+          return
+        }
+
+        await loadTitanFitData(user.id)
+      } else {
+        setLoadingData(false)
+        setScreen('welcome')
+      }
+    } catch (error) {
+      console.error(
+        'Error al inicializar TitanFit:',
+        error
+      )
+
+      setDataError(error.message)
       setScreen('welcome')
+    } finally {
+      setInitializingApp(false)
     }
   }
 
   initTitanFit()
 }, [])
+
+if (initializingApp) {
+  return (
+    <TitanBackground>
+      <ScreenContainer
+        center
+        className="text-center"
+      >
+        <div className="flex w-full flex-col items-center justify-center">
+          <TitanLogo />
+
+          <div className="mt-8 flex items-center gap-3">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-300" />
+
+            <p
+              className="text-sm font-bold uppercase tracking-[0.16em]"
+              style={{
+                color: 'var(--titan-text-secondary)',
+              }}
+            >
+              Cargando TitanFit
+            </p>
+          </div>
+        </div>
+      </ScreenContainer>
+    </TitanBackground>
+  )
+}
 
   if (screen === 'welcome') {
   return (

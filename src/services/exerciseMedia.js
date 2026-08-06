@@ -41,13 +41,32 @@ export async function getExerciseMediaUrls(exercise) {
   const thumbnailPath = exercise?.thumbnail_url || null
   const videoPath = exercise?.video_url || null
 
-  const [thumbnailUrl, videoUrl] = await Promise.all([
-    getExerciseMediaSignedUrl('thumbnail', thumbnailPath),
-    getExerciseMediaSignedUrl('video', videoPath),
-  ])
+  if (videoPath) {
+    const videoUrl = await getExerciseMediaSignedUrl(
+      'video',
+      videoPath
+    )
+
+    return {
+      thumbnailUrl: null,
+      videoUrl,
+    }
+  }
+
+  if (thumbnailPath) {
+    const thumbnailUrl = await getExerciseMediaSignedUrl(
+      'thumbnail',
+      thumbnailPath
+    )
+
+    return {
+      thumbnailUrl,
+      videoUrl: null,
+    }
+  }
 
   return {
-    thumbnailUrl,
-    videoUrl,
+    thumbnailUrl: null,
+    videoUrl: null,
   }
 }

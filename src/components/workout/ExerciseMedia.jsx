@@ -98,7 +98,6 @@ function ExerciseMedia({
           : 'exercise-media__video'
          }
           src={media.videoUrl}
-          poster={media.thumbnailUrl || undefined}
           autoPlay
           muted
           loop
